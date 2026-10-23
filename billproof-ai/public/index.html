@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BillProof AI — Prescription &amp; Invoice Verification</title>
+    <meta name="description" content="AI-powered prescription and pharmacy invoice verification. Compare, flag discrepancies, and verify billing with Google Gemini and a deterministic rule engine.">
+    <meta name="theme-color" content="#06090f">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Animated background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="app-container">
+
+        <!-- ═══ Header ═══ -->
+        <header class="app-header">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 15l-4-4 1.41-1.41L11 13.17l5.59-5.59L18 9l-7 7z"/>
+                    </svg>
+                </div>
+                <h1 class="app-title">BillProof AI</h1>
+            </div>
+            <p class="app-tagline">Verify the bill. Trace every flag. Trust the evidence.</p>
+
+            <div class="tech-badges">
+                <span class="tech-badge">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/><path d="M12 2a10 10 0 100 20 10 10 0 000-20z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Google Gemini
+                </span>
+                <span class="tech-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    Rule Engine
+                </span>
+                <span class="tech-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                    Node.js + Express
+                </span>
+                <span class="tech-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Cloud Run Ready
+                </span>
+            </div>
+        </header>
+
+        <!-- ═══ Upload Card ═══ -->
+        <div class="glass-card">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Upload Documents
+            </div>
+
+            <form id="uploadForm" novalidate>
+                <div class="upload-grid">
+                    <!-- Prescription zone -->
+                    <div class="upload-zone" id="rxZone">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                        </div>
+                        <div class="upload-label">Doctor's Prescription</div>
+                        <div class="upload-hint">PDF, JPEG, PNG, or WebP · Max 8 MB</div>
+                        <div class="upload-filename">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                            <span id="rxFileName"></span>
+                        </div>
+                        <input type="file" class="upload-input" id="rxInput" name="prescription" accept=".pdf,image/jpeg,image/png,image/webp">
+                    </div>
+
+                    <!-- Invoice zone -->
+                    <div class="upload-zone" id="invZone">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="18" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="7" x2="12" y2="7"/>
+                            </svg>
+                        </div>
+                        <div class="upload-label">Pharmacy Invoice</div>
+                        <div class="upload-hint">PDF, JPEG, PNG, or WebP · Max 8 MB</div>
+                        <div class="upload-filename">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                            <span id="invFileName"></span>
+                        </div>
+                        <input type="file" class="upload-input" id="invInput" name="invoice" accept=".pdf,image/jpeg,image/png,image/webp">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                        Verify &amp; Reconcile
+                    </span>
+                </button>
+            </form>
+
+            <!-- Error banner -->
+            <div class="error-banner" id="errorBanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                <span id="errorText"></span>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+                <div class="progress-steps">
+                    <div class="progress-step"><span class="step-dot"></span> Uploading</div>
+                    <div class="progress-step"><span class="step-dot"></span> Gemini Extraction</div>
+                    <div class="progress-step"><span class="step-dot"></span> Rule Engine</div>
+                    <div class="progress-step"><span class="step-dot"></span> Complete</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ Results ═══ -->
+        <div class="results-section" id="resultsSection">
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statPrescribed">0</div>
+                    <div class="stat-label">Prescribed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statInvoiced">0</div>
+                    <div class="stat-label">Invoiced</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value" id="statMatched">0</div>
+                    <div class="stat-label">Matched</div>
+                </div>
+                <div class="stat-card" id="statFlagsCard">
+                    <div class="stat-value" id="statFlags">0</div>
+                    <div class="stat-label">Flags</div>
+                </div>
+            </div>
+
+            <!-- Confidence -->
+            <div class="confidence-row">
+                <div class="confidence-ring">
+                    <svg width="64" height="64" viewBox="0 0 64 64">
+                        <circle class="confidence-ring-bg" cx="32" cy="32" r="26"/>
+                        <circle class="confidence-ring-fill" id="confRing" cx="32" cy="32" r="26"/>
+                    </svg>
+                    <div class="confidence-value" id="confValue">0%</div>
+                </div>
+                <div class="confidence-label" id="confLabel">Avg. extraction confidence: <strong>—</strong></div>
+            </div>
+
+            <!-- Matched Items Table -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                    Matched Items
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Prescription</th>
+                                <th>Invoice</th>
+                                <th>Match</th>
+                                <th>Qty (Rx→Inv)</th>
+                                <th>Line Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matchedBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Flags -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+                    Verification Flags
+                </div>
+                <div id="flagsList"></div>
+            </div>
+
+            <!-- Arithmetic Verification -->
+            <div class="glass-card">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/></svg>
+                    Arithmetic Verification
+                </div>
+                <div class="arithmetic-grid" id="arithmeticGrid"></div>
+            </div>
+
+            <!-- Clarification Draft -->
+            <div class="glass-card" id="clarificationSection" style="display:none">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Draft Clarification for Pharmacy
+                </div>
+                <div class="clarification-box" id="clarificationBox"></div>
+                <button class="btn-secondary" id="copyClari">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    Copy Message
+                </button>
+            </div>
+
+            <!-- Meta -->
+            <div class="meta-bar">
+                <div class="meta-item">⏱ <strong id="metaTime">—</strong></div>
+                <div class="meta-item">🤖 Model: <strong id="metaModel">—</strong></div>
+                <div class="meta-item">📋 Items: <strong id="metaItems">—</strong></div>
+            </div>
+
+            <!-- Raw JSON -->
+            <div class="json-toggle">
+                <details>
+                    <summary>▶ View Raw JSON Response</summary>
+                    <pre class="json-pre" id="rawJson"></pre>
+                </details>
+            </div>
+        </div>
+
+        <!-- ═══ Disclaimer ═══ -->
+        <div class="disclaimer">
+            <strong>BillProof AI</strong> focuses on administrative verification and billing consistency.
+            It does not provide medical advice or automatic fraud detection.<br>
+            Unreadable or ambiguous information is flagged for human review.<br>
+            No comprehensive drug database, MRP, batch, or expiry validation is applied in this version.
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
